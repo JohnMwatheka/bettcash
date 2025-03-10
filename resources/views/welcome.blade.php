@@ -214,7 +214,7 @@
 							<a class="gap-3 d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								<img src="assets/images/avatars/avatar-2.png" class="user-img" alt="user avatar">
 								<div class="user-info">
-									<p class="mb-0 user-name">{{ Auth::user()->name }}</p>
+									<p class="mb-0 user-name">{{ Auth::user()->first_name}}</p>
 									<p class="mb-0 designattion">...</p>
 								</div>
 							</a>
@@ -296,26 +296,26 @@
 
 	<!-- search modal -->
 	<!-- Modal for Bet Slip -->
-<div class="modal fade" id="betslip" tabindex="-1" aria-labelledby="betslipLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="betslipLabel">Bet Slip</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <ul id="betslip-content" class="list-group">
+		<div class="modal fade" id="betslip" tabindex="-1" aria-labelledby="betslipLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="betslipLabel">Bet Slip</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<ul id="betslip-content" class="list-group">
 
-				</ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="place-bet-btn">Save selections</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- end search modal -->
+						</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" id="place-bet-btn">Save selections</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end search modal -->
 	
 
 

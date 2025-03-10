@@ -1,37 +1,3 @@
-<!--sidebar wrapper -->
-<div class="sidebar-wrapper" data-simplebar="true">
-    <div class="sidebar-header">
-        <div>
-            <img src="assets/images/logo-icon.png" class="logo-icon" alt="logo icon">
-        </div>
-        <a href="{{ route('index') }}">
-            <h4 class="logo-text">Bettcash</h4>
-        </a>
-        <div class="toggle-icon ms-auto"><i class='bx bx-arrow-back'></i>
-        </div>
-     </div>
-    <!--navigation-->
-    <ul class="metismenu" id="menu">
-        <li>
-            <a href="javascript:;" class="has-arrow">
-                <div class="parent-icon"><i class='bx bx-home-alt'></i>
-                </div>
-                <div class="menu-title">Dashboard</div>
-            </a>
-            <ul>
-                <li> <a href="{{ route('bets.selections') }}"><i class='bx bx-radio-circle'></i>Selections</a>
-                </li>
-                <li> <a href="index2.html"><i class='bx bx-radio-circle'></i>Bets</a>
-                </li>
-                <li> <a href="index3.html"><i class='bx bx-radio-circle'></i>Wallet</a>
-                </li>
-            </ul>
-        </li>
-    </ul>
-    <!--end navigation-->
-</div>
-<!--end sidebar wrapper -->
-<!--start header -->
 <header>
     <div class="topbar d-flex align-items-center">
         <nav class="gap-3 navbar navbar-expand">
@@ -72,7 +38,7 @@
                                   <a href="javascript:;">
                                     <div class="text-center app-box">
                                       <div class="app-icon">
-                                          <img src="assets/images/app/slack.png" width="30" alt="">
+                                          <img src="{{ asset('assets/images/app/slack.png') }}" width="30" alt="">
                                       </div>
                                       <div class="app-name">
                                           <p class="mt-1 mb-0">Slack</p>
@@ -135,7 +101,7 @@
                                     <div class="gap-3 d-flex align-items-center">
                                         <div class="position-relative">
                                             <div class="cart-product rounded-circle bg-light">
-                                                <img src="assets/images/products/11.png" class="" alt="product image">
+                                                <img src="{{ asset('assets/images/products/11.png') }}" class="" alt="product image">
                                             </div>
                                         </div>
                                         <div class="flex-grow-1">
@@ -167,7 +133,7 @@
                 @auth
                     <!-- Logged-in User View -->
                     <a class="gap-3 d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="assets/images/avatars/avatar-2.png" class="user-img" alt="user avatar">
+                        <img src="{{ asset('assets/images/avatars/avatar-2.png') }}" class="user-img" alt="user avatar">
                         <div class="user-info">
                             <p class="mb-0 user-name">{{ Auth::user()->first_name}}</p>
                             <p class="mb-0 designattion">{{ Auth::user()->last_name}}</p>
@@ -204,4 +170,3 @@
         </nav>
     </div>
 </header>
-<!--end header -->

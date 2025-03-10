@@ -7,7 +7,7 @@ use App\Http\Controllers\MatchController; // Ensure this import is correct
 use App\Http\Controllers\BetController;
 
 // Welcome Route without middleware
-Route::get('/welcome', [SportsController::class, 'Index'])->withoutMiddleware([])->name('index');
+Route::get('/', [SportsController::class, 'Index'])->withoutMiddleware([])->name('index');
 
 // Dashboard Route with auth middleware
 Route::get('/dashboard', function () {
@@ -38,6 +38,17 @@ Route::get('/register', function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/bets/store', [BetController::class, 'store'])->name('bets.store');
+    Route::get('/bets/selections', [BetController::class, 'Selections'])->name('bets.selections');
+    Route::get('/bets/{id}', [BetController::class, 'show'])->name('bets.show');
+    Route::get('/bets/delete/{id}', [BetController::class, 'destroy'])->name('bets.delete');
+    Route::post('/update-stake', [BetController::class, 'updateStake'])->name('update.stake');
+    Route::get('/multibets', [BetController::class, 'multibets'])->name('multibets.index');
+    Route::get('/multibets', [BetController::class, 'multibets'])->name('multibets.index');
+    Route::post('/multibets/store', [BetController::class, 'storeMultibet'])->name('multibets.store');
+    Route::delete('/multibets/{id}', [BetController::class, 'deleteMultibet'])->name('multibets.destroy');
+    Route::get('/multibets/placed', [BetController::class, 'getPlacedMultibets'])->name('multibets.placed');
+
+
 });
 
 
