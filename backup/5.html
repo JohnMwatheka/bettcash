@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .sports-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            background-color: #fff;
+        }
+        .sports-card__head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sports-card__team {
+            display: flex;
+            align-items: center;
+        }
+        .sports-card__team-flag img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .sports-card__info {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Matches</h1>
+        
+        <div class="d-flex justify-content-center mb-3">
+            <button class="btn btn-primary mx-2" id="showUpcoming">Upcoming Matches</button>
+            <button class="btn btn-success mx-2" id="showPlayed">Played Matches</button>
+        </div>
+
+        <div id="matches-container">
+            <p class="text-center">Click a button to load matches.</p>
+        </div>
+    </div>
+
+    <script>
+        function fetchMatches() {
+            $.ajax({
+                url: '/matches',
+                method: 'GET',
+                success: function(response) {
+                    renderMatches(response);
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    alert('An error occurred while fetching matches.');
+                }
+            });
+        }
+
+        function renderMatches(response) {
+            let upcomingHtml = '<h2 class="text-center">Upcoming Matches</h2>';
+            let playedHtml = '<h2 class="text-center">Played Matches</h2>';
+
+            if (response.upcoming.length === 0) {
+                upcomingHtml += '<p class="text-center">No upcoming matches.</p>';
+            } else {
+                response.upcoming.forEach(match => {
+                    upcomingHtml += `
+                        <div class="sports-card">
+                            <div class="sports-card__head">
+                                <span class="sports-card__team">
+                                    <span class="sports-card__team-flag">
+                                        <img src="${match.home_team_image}" alt="Home Team">
+                                    </span>
+                                    <span class="sports-card__team-name">${match.home_team_name}</span>
+                                </span>
+
+                                <span class="sports-card__info">
+									<span class="sports-card__info-time">${match.date} <br /> ${match.time}</span>
+								</span>
+
+                                <span class="sports-card__team">
+                                    <span class="sports-card__team-flag">
+                                        <img src="${match.away_team_image}" alt="Away Team">
+                                    </span>
+                                    <span class="sports-card__team-name">${match.away_team_name}</span>
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            if (response.played.length === 0) {
+                playedHtml += '<p class="text-center">No matches played yet.</p>';
+            } else {
+                response.played.forEach(match => {
+                    playedHtml += `
+                        <div class="sports-card">
+                            <div class="sports-card__head">
+                                <span class="sports-card__team">
+                                    <span class="sports-card__team-flag">
+                                        <img src="${match.home_team_image}" alt="Home Team">
+                                    </span>
+                                    <span class="sports-card__team-name">${match.home_team_name}</span>
+                                </span>
+
+                                <span class="sports-card__info">
+									<span class="sports-card__info-time">${match.date} <br /> ${match.time}</span>
+								</span>
+                                <span class="sports-card__team">
+                                    <span class="sports-card__team-flag">
+                                        <img src="${match.away_team_image}" alt="Away Team">
+                                    </span>
+                                    <span class="sports-card__team-name">${match.away_team_name}</span>
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            $('#matches-container').html(upcomingHtml + playedHtml);
+        }
+
+        $(document).ready(function() {
+            $('#showUpcoming').click(function() {
+                fetchMatches('upcoming');
+            });
+
+            $('#showPlayed').click(function() {
+                fetchMatches('played');
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+<script>
+	function fetchMatches(type) {
+		$.ajax({
+			url: '/matches',
+			method: 'GET',
+			success: function(response) {
+				if (type === 'upcoming') {
+					renderMatches(response.upcoming, '#upcoming-matches', 'No upcoming matches.');
+				} else {
+					renderMatches(response.played, '#played-matches', 'No matches played yet.');
+				}
+			},
+			error: function(xhr) {
+				console.error(xhr.responseText);
+				alert('An error occurred while fetching matches.');
+			}
+		});
+	}
+
+	function renderMatches(matches, containerId, emptyMessage) {
+		let htmlContent = '';
+		if (matches.length === 0) {
+			htmlContent = `<p class='text-center'>${emptyMessage}</p>`;
+		} else {
+			matches.forEach(match => {
+				htmlContent += `
+					<div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+						<div class="sports-card">
+							<div class="sports-card__head">
+								<span class="sports-card__team">
+									<span class="sports-card__team-flag">
+										<img src="${match.home_team_image}" alt="Home Team">
+									</span>
+									<span class="sports-card__team-name text-capitalize font-weight-bold">${match.home_team_name}</span>
+								</span>
+								<span class="sports-card__info">
+									<span class="sports-card__info-time font-italic">${match.date} <br /> ${match.time}</span>
+								</span>
+								<span class="sports-card__team">
+									<span class="sports-card__team-flag">
+										<img src="${match.away_team_image}" alt="Away Team">
+									</span>
+									<span class="sports-card__team-name text-capitalize font-weight-bold">${match.away_team_name}</span>
+								</span>
+							</div>
+						</div>
+					</div>
+				`;
+			});
+		}
+		$(containerId).html(htmlContent);
+	}
+
+	$(document).ready(function() {
+		$('#showUpcoming').click(function() {
+			fetchMatches('upcoming');
+		});
+		$('#showPlayed').click(function() {
+			fetchMatches('played');
+		});
+	});
+</script>

@@ -1,0 +1,104 @@
+<div class="container mt-5">
+    <h1 class="text-center">Sports and Leagues</h1>
+
+    <!-- Sports Carousel -->
+    <div id="sportsCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            @foreach ($sports->chunk(4) as $chunkIndex => $chunk)
+                <div class="carousel-item {{ $chunkIndex === 0 ? 'active' : '' }}">
+                    <div class="d-flex justify-content-center">
+                        @foreach ($chunk as $sport)
+                            <div class="text-center mx-3">
+                                <div class="card text-center bg-light shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="#" class="text-decoration-none fetch-leagues" data-sport-id="{{ $sport->id }}">
+                                                {{ $sport->name }}
+                                            </a>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#sportsCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#sportsCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- Leagues Carousel -->
+    <div class="row" style="justify-items: center; align-items: center;">
+        <div class="col-md-7 bg-dark shadow-sm p-2 my-2 rounded">
+            <div id="leaguesCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner" id="leagues-container">
+                    <!-- Dynamically loaded leagues will appear here -->
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#leaguesCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#leaguesCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('click', '.fetch-leagues', function (e) {
+        e.preventDefault();
+        const sportId = $(this).data('sport-id');
+
+        // Make an AJAX request to fetch leagues for the selected sport
+        $.ajax({
+            url: `/sports/${sportId}/leagues`,
+            method: 'GET',
+            beforeSend: function () {
+                // Show a loading spinner or message
+                $('#leagues-container').html('<div class="carousel-item active"><div class="text-center text-white">Loading...</div></div>');
+            },
+            success: function (response) {
+                if (response.status === 'success') {
+                    const leagues = response.data;
+                    let html = '';
+                    
+                    leagues.forEach((league, index) => {
+                        if (index % 6 === 0) {
+                            html += `<div class="carousel-item ${index === 0 ? 'active' : ''}"><div class="d-flex justify-content-center">`;
+                        }
+                        
+                        html += `
+                            <div class="text-white mx-2">
+                                <div class="card-body">
+                                    <p class="card-title">${league.name}</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        if ((index + 1) % 6 === 0 || index === leagues.length - 1) {
+                            html += `</div></div>`;
+                        }
+                    });
+                    
+                    $('#leagues-container').html(html);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                $('#leagues-container').html('<div class="carousel-item active"><div class="text-danger text-center">An error occurred while fetching leagues.</div></div>');
+            }
+        });
+    });
+</script>

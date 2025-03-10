@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports and Leagues</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Sports and Leagues</h1>
+
+        <!-- Sports Section -->
+        <div id="sports-container" class="row my-4">
+            @foreach ($sports as $sport)
+                <div class="col-md-3">
+                    <div class="card text-center bg-light shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $sport->name }}</h5>
+                            <button 
+                                class="btn btn-primary fetch-leagues" 
+                                data-sport-id="{{ $sport->id }}">
+                                View Leagues
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Leagues Section -->
+        <div id="leagues-container" class="my-4">
+            <!-- Dynamically loaded leagues will appear here -->
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).on('click', '.fetch-leagues', function () {
+            const sportId = $(this).data('sport-id');
+
+            // Make an AJAX request to fetch leagues for the selected sport
+            $.ajax({
+                url: `/sports/${sportId}/leagues`,
+                method: 'GET',
+                beforeSend: function () {
+                    // Show a loading spinner or message
+                    $('#leagues-container').html('<div class="text-center">Loading...</div>');
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const leagues = response.data;
+
+                        // Render leagues dynamically
+                        let html = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <ul class="list-group">
+                        `;
+
+                        leagues.forEach(league => {
+                            html += `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    ${league.name}
+                                    <span class="badge bg-primary rounded-pill">${league.id}</span>
+                                </li>
+                            `;
+                        });
+
+                        html += `
+                                    </ul>
+                                </div>
+                            </div>
+                        `;
+
+                        $('#leagues-container').html(html);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    $('#leagues-container').html('<div class="text-danger text-center">An error occurred while fetching leagues.</div>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
