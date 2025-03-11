@@ -5,20 +5,22 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SportsController;
 use App\Http\Controllers\MatchController; // Ensure this import is correct
 use App\Http\Controllers\BetController;
+use App\Http\Controllers\UserController;
 
 // Welcome Route without middleware
 Route::get('/', [SportsController::class, 'Index'])->withoutMiddleware([])->name('index');
 
 // Dashboard Route with auth middleware
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [UserController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 // Profile Routes with auth middleware
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/upload', [UserController::class, 'uploadProfileImage'])->name('profile.upload');
 });
 
 // Match Routes

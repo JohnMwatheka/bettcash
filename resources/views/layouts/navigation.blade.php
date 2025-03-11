@@ -167,7 +167,7 @@
                 @auth
                     <!-- Logged-in User View -->
                     <a class="gap-3 d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="assets/images/avatars/avatar-2.png" class="user-img" alt="user avatar">
+                        <img src="{{ asset('assets/upload/users/' . ($userData->profile_image ?? 'default_user_img.jpeg')) }}" class="user-img" alt="user avatar">
                         <div class="user-info">
                             <p class="mb-0 user-name">{{ Auth::user()->first_name}}</p>
                             <p class="mb-0 designattion">{{ Auth::user()->last_name}}</p>

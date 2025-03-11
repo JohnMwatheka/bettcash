@@ -101,7 +101,7 @@
                                     <div class="gap-3 d-flex align-items-center">
                                         <div class="position-relative">
                                             <div class="cart-product rounded-circle bg-light">
-                                                <img src="{{ asset('assets/images/products/11.png') }}" class="" alt="product image">
+                                                <img src="{{ asset('assets/upload/users/' . ($userData->profile_image ?? 'default_user_img.jpeg')) }}" class="" alt="product image">
                                             </div>
                                         </div>
                                         <div class="flex-grow-1">

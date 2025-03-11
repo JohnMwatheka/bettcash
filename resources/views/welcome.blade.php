@@ -6,29 +6,39 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!--favicon-->
-	<link rel="icon" href="assets/images/favicon-32x32.png" type="image/png"/>
-	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<link rel="icon" href="{{asset('assets/images/favicon-32x32.png')}}" type="image/png"/>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+
 
 	<!--plugins-->
-	<link href="assets/plugins/vectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet"/>
-	<link href="assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
-	<link href="assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
-	<link href="assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet"/>
+	<link href="{{asset('assets/plugins/vectormap/jquery-jvectormap-2.0.2.css')}}" rel="stylesheet"/>
+	<link href=" {{asset('assets/plugins/simplebar/css/simplebar.css')}}" rel="stylesheet" />
+	<link href="{{asset('assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css')}}" rel="stylesheet" />
+	<link href="{{asset('assets/plugins/metismenu/css/metisMenu.min.css')}}" rel="stylesheet"/>
 	<!-- loader-->
-	<link href="assets/css/pace.min.css" rel="stylesheet"/>
-	<script src="assets/js/pace.min.js"></script>
+	<link href="{{asset('assets/css/pace.min.css')}}" rel="stylesheet"/>
+	<script src="{{asset('assets/js/pace.min.js')}}"></script>
 	<!-- Bootstrap CSS -->
-	<link href="assets/css/bootstrap.min.css" rel="stylesheet">
-	<link href="assets/css/bootstrap-extended.css" rel="stylesheet">
+	<link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
+	<link href="{{asset('assets/css/bootstrap-extended.css')}}" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="assets/css/app.css" rel="stylesheet">
-	<link href="assets/css/icons.css" rel="stylesheet">
+	<link href="{{asset('assets/css/app.css')}}" rel="stylesheet">
+	<link href="{{asset('assets/css/icons.css')}}" rel="stylesheet">
 	<!-- Theme Style CSS -->
-	<link rel="stylesheet" href="assets/css/dark-theme.css"/>
-	<link rel="stylesheet" href="assets/css/semi-dark.css"/>
-	<link rel="stylesheet" href="assets/css/header-colors.css"/>
-	<title>Rocker - Bootstrap 5 Admin Dashboard Template</title>
+	<link rel="stylesheet" href="{{asset('assets/css/dark-theme.css')}}"/>
+	<link rel="stylesheet" href="{{asset('assets/css/semi-dark.css')}}"/>
+	<link rel="stylesheet" href="{{asset('assets/css/header-colors.css')}}"/>
+
+
+	<!-- Datables  css-->
+	<link href="{{ asset('assets/plugins/datatable/css/dataTables.bootstrap5.min.css')}}" rel="stylesheet" />
+
+	<!--Toastr css. It show alerts during validation-->
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+	<title>Bettcash</title>
 	<!-- Include Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Include jQuery -->
@@ -77,85 +87,138 @@
 <body>
 	<!--wrapper-->
 	<div class="wrapper">
+
 		<!--sidebar wrapper -->
-		<div class="sidebar-wrapper" data-simplebar="true">
-			<div class="sidebar-header">
-				<div>
-					<img src="assets/images/logo-icon.png" class="logo-icon" alt="logo icon">
+			<div class="sidebar-wrapper" data-simplebar="true">
+				<div class="sidebar-header">
+					<div>
+						<img src="assets/images/logo-icon.png" class="logo-icon" alt="logo icon">
+					</div>
+					<div>
+						<h4 class="logo-text">Bettcash</h4>
+					</div>
+					<div class="toggle-icon ms-auto"><i class='bx bx-arrow-back'></i></div>
 				</div>
-				<div>
-					<h4 class="logo-text">Bettcash</h4>
-				</div>
-				<div class="toggle-icon ms-auto"><i class='bx bx-arrow-back'></i></div>
-			</div>
-		
-			<!-- Navigation -->
-			<ul class="metismenu text-decoration-none" id="menu">
-				@foreach ($sports as $sport)
+
+				<!-- Navigation -->
+				<ul class="metismenu text-decoration-none" id="menu">
 					<li>
 						<a href="javascript:;" class="has-arrow">
-							<div class="parent-icon"></div>
-							<div class="menu-title text-capitalize">{{ $sport->name }}</div>
+							<div class="parent-icon"><i class='bx bx-calendar-event'></i></div>
+							<div class="menu-title">Matches</div>
 						</a>
 						<ul>
-							@foreach ($sport->leagues as $league)
-								<li>
-									<a href="" class="d-flex align-items-center text-decoration-none">
-										<img src="{{ $league->logo }}" alt="{{ $league->name }} Logo" 
-											 class="img-thumbnail me-2" 
-											 style="width: 25px; height: 25px; border-radius: 50%;">
-										<span>{{ $league->name }}</span>
-									</a>
-								</li>
-							@endforeach
+							<li> <a href="#" id="showUpcoming"><i class='bx bx-time-five'></i> Prematch</a></li>
+							<li> <a href="#" id="showPlayed"><i class='bx bx-play-circle'></i> Live</a></li>
 						</ul>
 					</li>
-				@endforeach
-			</ul>
-			<!-- End Navigation -->
-		</div>
+					@foreach ($sports as $sport)
+						<li>
+							<a href="javascript:;" class="has-arrow">
+								<div class="parent-icon">
+									@if(strtolower($sport->name) == 'soccer') <i class='bx bx-football'></i>
+									@elseif(strtolower($sport->name) == 'basketball') <i class='bx bx-basketball'></i>
+									@elseif(strtolower($sport->name) == 'tennis') <i class='bx bx-tennis-ball'></i>
+									@elseif(strtolower($sport->name) == 'baseball') <i class='bx bx-baseball'></i>
+									@elseif(strtolower($sport->name) == 'american football') <i class='bx bx-football'></i>
+									@elseif(strtolower($sport->name) == 'volleyball') <i class='bx bx-volleyball'></i>
+									@elseif(strtolower($sport->name) == 'ice hockey') <i class='bx bx-hockey'></i>
+									@elseif(strtolower($sport->name) == 'cricket') <i class='bx bx-cricket-ball'></i>
+									@elseif(strtolower($sport->name) == 'horse racing') <i class='bx bx-horse'></i>
+									@elseif(strtolower($sport->name) == 'handball') <i class='bx bx-hand'></i>
+									@elseif(strtolower($sport->name) == 'e-sports') <i class='bx bx-joystick'></i>
+									@else <i class='bx bx-trophy'></i> {{-- Default icon --}}
+									@endif
+								</div>
+								<div class="menu-title text-capitalize">{{ $sport->name }}</div>
+							</a>
+							<ul>
+								@foreach ($sport->leagues as $league)
+									<li>
+										<a href="" class="d-flex align-items-center text-decoration-none">
+											<img src="{{ $league->logo }}" alt="{{ $league->name }} Logo" 
+												class="img-thumbnail me-2" 
+												style="width: 25px; height: 25px; border-radius: 50%;">
+											<span>{{ $league->name }}</span>
+										</a>
+									</li>
+								@endforeach
+							</ul>
+						</li>
+					@endforeach
+				</ul>
+				<!-- End Navigation -->
+			</div>
+			<!--end sidebar wrapper -->
+
+
 		
-		
-		<!--end sidebar wrapper -->
+
 		<!--start header -->
 		<header>
 			<div class="topbar d-flex align-items-center">
 				<nav class="gap-3 navbar navbar-expand">
 					<div class="mobile-toggle-menu"><i class='bx bx-menu'></i>
 					</div>
-						<div class="position-relative d-lg-block ">
-						<p class="mx-2 btn btn-danger btn-sm" id="showUpcoming">Upcoming</p>										
-					  </div>
-					  <div class="position-relative d-lg-block">						
-						<p class="mx-2 btn btn-info btn-sm" id="showPlayed">All</p>						
-					  </div>
-
+		
 					  <div class="position-relative search-bar d-lg-block d-none" data-bs-toggle="modal" data-bs-target="#SearchModal">
 						<input class="px-5 form-control" disabled type="search" placeholder="Search">
 						<span class="position-absolute top-50 search-show ms-3 translate-middle-y start-0 fs-5"><i class='bx bx-search'></i></span>
 					  </div>
-
-
+		
+		
 					  <div class="top-menu ms-auto">
 						<ul class="gap-1 navbar-nav align-items-center">
 							<li class="nav-item mobile-search-icon d-flex d-lg-none" data-bs-toggle="modal" data-bs-target="#SearchModal">
 								<a class="nav-link" href="avascript:;"><i class='bx bx-search'></i>
 								</a>
 							</li>
-							
+							<li class="nav-item dropdown dropdown-laungauge d-none d-sm-flex">
+								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="avascript:;" data-bs-toggle="dropdown"><img src="assets/images/county/02.png" width="22" alt="">
+								</a>
+								<ul class="dropdown-menu dropdown-menu-end">
+									<li><a class="py-2 dropdown-item d-flex align-items-center" href="javascript:;"><img src="assets/images/county/01.png" width="20" alt=""><span class="ms-2">English</span></a>
+									</li>                           
+								</ul>
+							</li>
 							<li class="nav-item dark-mode d-none d-sm-flex">
 								<a class="nav-link dark-mode-icon" href="javascript:;"><i class='bx bx-moon'></i>
 								</a>
 							</li>
+		
+							<li class="nav-item dropdown dropdown-app">
+								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown" href="javascript:;"><i class='bx bx-grid-alt'></i></a>
+								<div class="p-0 dropdown-menu dropdown-menu-end">
+									<div class="p-2 my-2 app-container">
+									  <div class="p-2 row gx-0 gy-2 row-cols-3 justify-content-center">
+										 <div class="col">
+										  <a href="javascript:;">
+											<div class="text-center app-box">
+											  <div class="app-icon">
+												  <img src="{{ asset('assets/images/app/slack.png') }}" width="30" alt="">
+											  </div>
+											  <div class="app-name">
+												  <p class="mt-1 mb-0">Slack</p>
+											  </div>
+											  </div>
+											</a>
+										 </div>
+				
+									  </div><!--end row-->
+				
+									</div>
+								</div>
+							</li>
+		
 							<li class="nav-item dropdown dropdown-large">
-								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" data-bs-toggle="dropdown"><span class="alert-count">1</span>
+								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" data-bs-toggle="dropdown"><span class="alert-count">7</span>
 									<i class='bx bx-bell'></i>
 								</a>
 								<div class="dropdown-menu dropdown-menu-end">
 									<a href="javascript:;">
 										<div class="msg-header">
 											<p class="msg-header-title">Notifications</p>
-											<p class="msg-header-badge">1 New</p>
+											<p class="msg-header-badge">8 New</p>
 										</div>
 									</a>
 									<div class="header-notifications-list">
@@ -171,7 +234,6 @@
 												</div>
 											</div>
 										</a>
-										
 									</div>
 									<a href="javascript:;">
 										<div class="text-center msg-footer">
@@ -181,30 +243,46 @@
 								</div>
 							</li>
 							<li class="nav-item dropdown dropdown-large">
-								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"> <span class="alert-count">8</span>
 									<i class='bx bx-shopping-bag'></i>
 								</a>
 								<div class="dropdown-menu dropdown-menu-end">
 									<a href="javascript:;">
 										<div class="msg-header">
-											<p class="msg-header-title">My Bets</p>
-											<p class="msg-header-badge" id="bet-count">0</p>
+											<p class="msg-header-title">My Cart</p>
+											<p class="msg-header-badge">10 Items</p>
 										</div>
 									</a>
-									<div class="header-message-list" id="header-betslip">
-										<p class="text-center text-muted" id="empty-betslip-message">No bets added.</p>
+									<div class="header-message-list">
+										<a class="dropdown-item" href="javascript:;">
+											<div class="gap-3 d-flex align-items-center">
+												<div class="position-relative">
+													<div class="cart-product rounded-circle bg-light">
+														<img src="{{ asset('assets/images/products/11.png') }}" class="" alt="product image">
+													</div>
+												</div>
+												<div class="flex-grow-1">
+													<h6 class="mb-0 cart-product-title">Men White T-Shirt</h6>
+													<p class="mb-0 cart-product-price">1 X $29.00</p>
+												</div>
+												<div class="">
+													<p class="mb-0 cart-price">$250</p>
+												</div>
+												<div class="cart-product-cancel"><i class="bx bx-x"></i>
+												</div>
+											</div>
+										</a>
 									</div>
 									<a href="javascript:;">
 										<div class="text-center msg-footer">
 											<div class="mb-3 d-flex align-items-center justify-content-between">
-												<h5 class="mb-0">Total stake</h5>
-												<h5 class="mb-0 ms-auto" id="total-stake">$0.00</h5>
+												<h5 class="mb-0">Total</h5>
+												<h5 class="mb-0 ms-auto">$489.00</h5>
 											</div>
-											<button class="btn btn-primary w-100">View bets</button>
+											<button class="btn btn-primary w-100">Checkout</button>
 										</div>
 									</a>
 								</div>
-								
 							</li>
 						</ul>
 					</div>
@@ -212,10 +290,10 @@
 						@auth
 							<!-- Logged-in User View -->
 							<a class="gap-3 d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								<img src="assets/images/avatars/avatar-2.png" class="user-img" alt="user avatar">
+								<img src="{{ asset('assets/upload/users/' . ($userData->profile_image ?? 'default_user_img.jpeg')) }}" class="user-img" alt="user avatar">
 								<div class="user-info">
 									<p class="mb-0 user-name">{{ Auth::user()->first_name}}</p>
-									<p class="mb-0 designattion">...</p>
+									<p class="mb-0 designattion">{{ Auth::user()->last_name}}</p>
 								</div>
 							</a>
 							<ul class="dropdown-menu dropdown-menu-end">
@@ -246,9 +324,6 @@
 							</ul>
 						@endauth
 					</div>
-					
-					
-					
 				</nav>
 			</div>
 		</header>
@@ -272,6 +347,7 @@
                     </div>
 
                 </div>
+
 				<div id="matches-container" class="py-3 my-3 mt-3 row">
 					<p class="text-center">Loading matches...</p>
 				</div>
@@ -418,24 +494,41 @@
 	</div>
 	<!--end switcher-->
 	<!-- Bootstrap JS -->
-	<script src="assets/js/bootstrap.bundle.min.js"></script>
+	<script src="{{asset('assets/js/bootstrap.bundle.min.js')}}"></script>
 	<!--plugins-->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
-	<script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
-	<script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
-	<script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
-    <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-	<script src="assets/plugins/chartjs/js/chart.js"></script>
-	<script src="assets/js/index.js"></script>
+	<script src="{{asset('assets/js/jquery.min.js')}}"></script>
+	<script src="{{asset('assets/plugins/simplebar/js/simplebar.min.js')}}"></script>
+	<script src="{{asset('assets/plugins/metismenu/js/metisMenu.min.js')}}"></script>
+	<script src="{{asset('assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js')}}"></script>
+	<script src="{{asset('assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js')}}"></script>
+    <script src="{{asset('assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js')}}"></script>
+	<script src="{{asset('assets/plugins/chartjs/js/chart.js')}}"></script>
+	<script src="{{asset('assets/js/index.js')}}"></script>
+	<!--app JS-->
+	<script src="{{asset('assets/js/app.js')}}"></script>
+    <script src="{{asset('assets/js/validate.min.js')}}"></script>
+    <script src="{{ asset('assets/js/code.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+	<!-- Data Table Javascript. It enables the search functionality and the next page functionality-->
+	<script src="{{ asset('assets/plugins/datatable/js/jquery.dataTables.min.js')}}"></script>
+	<script src="{{ asset('assets/plugins/datatable/js/dataTables.bootstrap5.min.js')}}"></script>
+	<script>
+		$(document).ready(function() {
+			$('#example').DataTable();
+		  } );
+	</script>
+	  <!-- End Data Table-->
+      <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	<!--app JS-->
-	<script src="assets/js/app.js"></script>
 	<script>
 		new PerfectScrollbar(".app-container");
 	</script>
-
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 	let allMatches = [];
@@ -515,7 +608,7 @@
 
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 
 <script>
   let betSlip = [];
