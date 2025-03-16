@@ -9,6 +9,7 @@
 	<link rel="icon" href="{{asset('assets/images/favicon-32x32.png')}}" type="image/png"/>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+	<meta name="user-auth" content="{{ Auth::check() ? 'authenticated' : 'guest' }}">
 
 
 
@@ -74,6 +75,30 @@
 			
 		}
 
+		/* Scrollable Odds Row */
+        .odds-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            scroll-behavior: smooth;
+        }
+
+        .odds-scroll-container::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .odds-scroll-container::-webkit-scrollbar-thumb {
+            background: #047cfc;
+            border-radius: 3px;
+        }
+
+        .odds-btn {
+            flex: 0 0 auto;
+        }
+
         
 
 	</style>
@@ -82,21 +107,21 @@
 
 
 	<!--Page Tittle-->
-	<title>Admin Dashboard</title>
+	<title>Markets</title>
 </head>
 
 <body>
 	<!--wrapper-->
 	<div class="wrapper">
 		<!--sidebar wrapper -->
-		@include('body.sidebar')
+		@include('markets.body.sidebar')
 		<!--end sidebar wrapper -->
 		<!--start header -->
-		@include('body.header')
+		@include('markets.body.header')
 		<!--end header -->
 		<!--start page wrapper -->
 		<div class="page-wrapper">
-			@yield('home')
+			@yield('markets')
 		</div>
 		<!--end page wrapper -->
 		<!--start overlay-->
@@ -105,7 +130,7 @@
 		<!--Start Back To Top Button-->
 		  <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
 		<!--End Back To Top Button-->
-		@include('body.footer')
+		@include('markets.body.footer')
 	</div>
 	<!--end wrapper-->
 
@@ -157,27 +182,26 @@
 		</div>
 	  </div>
     <!-- end search modal -->
-<!-- Modal for Bet Slip -->
-<div class="modal fade" id="betslip" tabindex="-1" aria-labelledby="betslipLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="betslipLabel">Bet Slip</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<ul id="betslip-content" class="list-group">
 
-				</ul>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" id="place-bet-btn">Save selections</button>
+	<!-- Betslip Modal -->
+	<div class="modal fade" id="betslip" tabindex="-1" aria-labelledby="betslipLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="betslipLabel">Your Bet Slip</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<ul id="betslip-content" class="list-group"></ul>
+				</div>
+				<div class="modal-footer">
+					<button id="place-bet-btn" class="btn btn-success">Place Bet</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<!-- end betslip modal -->
+	<!-- end betslip modal -->
+
 
 
 
@@ -298,215 +322,100 @@
 	<!-- Data Table Javascript. It enables the search functionality and the next page functionality-->
 	<script src="{{ asset('assets/plugins/datatable/js/jquery.dataTables.min.js')}}"></script>
 	<script src="{{ asset('assets/plugins/datatable/js/dataTables.bootstrap5.min.js')}}"></script>
-
-	<script>
-		let allMatches = [];
-		let currentPage = 1;
-		let lastPage = 1;
-		const perPage = 50; // Number of matches to show per page
-	
-		function fetchMatches(page = 1) {
-			$.ajax({
-				url: `/matches?page=${page}`,
-				method: 'GET',
-				timeout: 10000, // 10 seconds timeout
-				beforeSend: function () {
-					$('#matches-container').html('<p class="text-center">Loading matches...</p>');
-				},
-				success: function (response) {
-					allMatches = response.data; // Update allMatches with the new data
-					lastPage = response.last_page; // Update lastPage from the API response
-					currentPage = page; // Update currentPage
-					renderMatches(allMatches); // Render the matches
-					updatePaginationButtons(); // Update the state of pagination buttons
-				},
-				error: function (xhr, textStatus) {
-					console.error(xhr.responseText);
-					if (textStatus === "timeout") {
-						alert('Request timed out. Please try again.');
-					} else {
-						alert('An error occurred while fetching matches.');
-					}
-				}
-			});
-		}
-	
-		function renderMatches(matches) {
-			let htmlContent = '';
-			if (matches.length === 0) {
-				htmlContent = `<p class='text-center'>No matches available.</p>`;
-			} else {
-				matches.forEach(match => {
-					htmlContent += `
-						<div class="mb-3 col-12 col-sm-6 col-md-4 col-lg-4">
-							<div class="border-0 rounded shadow sports-card">
-								<div class="sports-card__head">
-									<span class="sports-card__team">
-										<span class="sports-card__team-flag">
-											<img src="${match.home_team_image}" alt="Home Team">
-										</span>
-										<span class="sports-card__team-name bold text-capitalize">${match.home_team_name}</span>
-									</span>
-									<span class="sports-card__info">
-										<span class="sports-card__info-time fs-0.1">${match.date} <br />${match.time}</span>
-									</span>
-									<span class="sports-card__team">
-										<span class="sports-card__team-flag">
-											<img src="${match.away_team_image}" alt="Away Team">
-										</span>
-										<span class="sports-card__team-name bold text-capitalize">${match.away_team_name}</span>
-									</span>
-								</div>
-								<div class="p-2 mt-3 text-center sports-card__odds bg-light">
-									<span class="me-3"><strong>Home:</strong> <span class="odds-btn">${match.odds_home_win}</span></span>
-									<span class="me-3"><strong>Draw:</strong> <span class="odds-btn">${match.odds_draw}</span></span>
-									<span class="me-3"><strong>Win:</strong> <span class="odds-btn">${match.odds_away_win}</span></span>
-								</div>
-								<div class="p-2 mt-3 text-center sports-card__odds bg-light">
-									<a class="me-3" href="{{ route('matches.odds') }}"><strong>Markets</strong> </a>
-								</div>
-							</div>
-						</div>
-					`;
-				});
-			}
-			$('#matches-container').html(htmlContent);
-		}
-	
-		function updatePaginationButtons() {
-			$('#prevPage').prop('disabled', currentPage <= 1); // Disable "Previous" on the first page
-			$('#nextPage').prop('disabled', currentPage >= lastPage); // Disable "Next" on the last page
-		}
-	
-		$(document).ready(function () {
-			fetchMatches(); // Fetch the first set of matches on page load
-	
-			// "Previous" button click handler
-			$('#prevPage').click(function () {
-				if (currentPage > 1) {
-					fetchMatches(currentPage - 1); // Fetch the previous set of matches
-				}
-			});
-	
-			// "Next" button click handler
-			$('#nextPage').click(function () {
-				if (currentPage < lastPage) {
-					fetchMatches(currentPage + 1); // Fetch the next set of matches
-				}
-			});
-		});
-	</script>
-	
-	
-	
-	<script>
-		let betSlip = [];
-	
-	function updateBetSlip() {
-		let betslipHtml = '';
-		let totalOdds = 1;
-	
-		if (betSlip.length === 0) {
-			betslipHtml = '<p class="text-center">No bets added yet.</p>';
-		} else {
-			betSlip.forEach((bet, index) => {
-				totalOdds *= parseFloat(bet.odds);
-				betslipHtml += `
-					<li class="list-group-item d-flex justify-content-between align-items-center bet-slip-item"
-						data-home-team="${bet.home_team}"
-						data-away-team="${bet.away_team}"
-						data-match-date="${bet.match_date}"
-						data-match-time="${bet.match_time}"
-						data-odds="${bet.odds}">
-						<div>
-							<strong>${bet.home_team} vs ${bet.away_team}</strong><br>
-							${bet.match_date} - ${bet.match_time} <br>
-							<span class="badge bg-success">Odds: ${bet.odds}</span>
-						</div>
-						<button class="btn btn-danger btn-sm" onclick="removeBet(${index})">Remove</button>
-					</li>`;
-			});
-		}
-	
-		$('#betslip-content').html(betslipHtml);
-	}
-	
-	function addToBetSlip(home, away, date, time, odds) {
-		if (!date || !time) {
-			alert("Match date or time is missing. Cannot place bet.");
-			return;
-		}
-	
-		betSlip.push({
-			home_team: home,
-			away_team: away,
-			match_date: date,
-			match_time: time,
-			odds: odds
-		});
-	
-		updateBetSlip();
-		$('#betslip').modal('show');
-	}
-	
-	function removeBet(index) {
-		betSlip.splice(index, 1);
-		updateBetSlip();
-	}
-	
-	// Check if user is authenticated
-	function isAuthenticated() {
-		return $('meta[name="user-auth"]').attr("content") === "authenticated";
-	}
-	
-	$(document).on('click', '.odds-btn', function() {
-		const matchElement = $(this).closest('.sports-card');
-		const home_team = matchElement.find('.sports-card__team-name').first().text().trim();
-		const away_team = matchElement.find('.sports-card__team-name').last().text().trim();
-		const date_time = matchElement.find('.sports-card__info-time').html().trim().split('<br>'); 
-		const date = date_time[0].trim();
-		const time = date_time.length > 1 ? date_time[1].trim() : '';
-	
-		const odds = $(this).text().trim();
-	
-		addToBetSlip(home_team, away_team, date, time, odds);
-	});
-	
-	$(document).on("click", "#place-bet-btn", function() {
-		if (betSlip.length === 0) {
-			alert("No bets selected!");
-			return;
-		}
-	
-		// Check if the user is logged in
-		if (!isAuthenticated()) {
-			alert("Authorization error! Please log in to place a bet.");
-			window.location.href = "/login"; // Redirect to login page
-			return;
-		}
-	
-		$.ajax({
-			url: "https://apartments-westlands-nairobi.co.ke/mpesa-app/public/bets/store",
-			type: "POST",
-			data: JSON.stringify({ bets: betSlip }),
-			contentType: "application/json",
-			headers: {
-				"X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-			},
-			success: function(response) {
-				alert(response.message);
-				betSlip = []; 
-				updateBetSlip();
-				$('#betslip').modal('hide');
-			},
-			error: function(xhr) {
-				console.error(xhr.responseJSON);
-				alert("Error placing bet. Check console for details.");
-			},
-		});
-	});
-	
-	</script>
+    
+    
+    <script>
+    let betSlip = [];
+    
+    function updateBetSlip() {
+        let betslipHtml = '';
+        
+        if (betSlip.length === 0) {
+            betslipHtml = '<p class="text-center">No bets added yet.</p>';
+        } else {
+            betSlip.forEach((bet, index) => {
+                betslipHtml += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center bet-slip-item">
+                        <div>
+                            <strong>${bet.home_team} vs ${bet.away_team}</strong><br>
+                            ${bet.match_date} - ${bet.match_time} <br>
+                            <span class="badge bg-success">Odds: ${bet.odds}</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="removeBet(${index})">Remove</button>
+                    </li>`;
+            });
+        }
+        $('#betslip-content').html(betslipHtml);
+    }
+    
+    function addToBetSlip(home, away, date, time, odds) {
+        betSlip.push({
+            home_team: home,
+            away_team: away,
+            match_date: date,
+            match_time: time,
+            odds: odds
+        });
+    
+        updateBetSlip();
+        $('#betslip').modal('show');
+    }
+    
+    function removeBet(index) {
+        betSlip.splice(index, 1);
+        updateBetSlip();
+    }
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+        return $('meta[name="user-auth"]').attr("content") === "authenticated";
+    }
+    
+    // Add bet when odds button is clicked
+    $(document).on('click', '.odds-btn', function () {
+        const home_team = $(this).data('home');
+        const away_team = $(this).data('away');
+        const date = $(this).data('date');
+        const time = $(this).data('time');
+        const odds = $(this).data('odds');
+    
+        addToBetSlip(home_team, away_team, date, time, odds);
+    });
+    
+    // Place Bet Button
+    $(document).on("click", "#place-bet-btn", function () {
+        if (betSlip.length === 0) {
+            alert("No bets selected!");
+            return;
+        }
+    
+        if (!isAuthenticated()) {
+            alert("Please log in to place a bet.");
+            window.location.href = "/login";
+            return;
+        }
+    
+        $.ajax({
+            url: "/bets/store",
+            type: "POST",
+            data: JSON.stringify({ bets: betSlip }),
+            contentType: "application/json",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            success: function (response) {
+                alert(response.message);
+                betSlip = [];
+                updateBetSlip();
+                $('#betslip').modal('hide');
+            },
+            error: function (xhr) {
+                console.error(xhr.responseJSON);
+                alert("Error placing bet. Check console for details.");
+            },
+        });
+    });
+    </script>
 
 
 	<script>

@@ -6,6 +6,7 @@ use App\Http\Controllers\SportsController;
 use App\Http\Controllers\MatchController; // Ensure this import is correct
 use App\Http\Controllers\BetController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BettingMarketController;
 
 // Welcome Route without middleware
 Route::get('/', [SportsController::class, 'Index'])->withoutMiddleware([])->name('index');
@@ -52,6 +53,12 @@ Route::middleware('auth')->group(function () {
 
 
 });
+
+//Routes accessible for all users
+Route::get('/betting-markets', [BettingMarketController::class, 'index'])->name('markets.index');
+Route::get('/betting-markets/{id}', [BettingMarketController::class, 'show'])->name('betting-markets.show');
+Route::get('/matches-with-odds', [MatchController::class, 'matchesWithOdds'])->name('matches.odds');
+
 
 
 

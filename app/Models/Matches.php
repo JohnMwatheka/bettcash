@@ -27,4 +27,8 @@ class Matches extends Model
         'odds_draw',
         'odds_away_win',
     ];
+    public function bettingMarkets()
+{
+    return $this->hasMany(BettingMarket::class, 'match_id', 'id');
+}
 }

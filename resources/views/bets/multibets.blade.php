@@ -1,4 +1,5 @@
 @extends('bets.betsdashboard')
+
 @section('bets')
 
 <div class="page-content">
@@ -49,6 +50,30 @@
                 </table>
             </div>
 
+            <h5 class="mt-4 card-title">Available Betting Markets</h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Market Name</th>
+                            <th>Category</th>
+                            <th>Odds</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($bettingMarkets as $market)
+                        <tr data-id="{{ $market->id }}">
+                            <td><input type="checkbox" class="market-checkbox" value="{{ $market->id }}" data-odds="{{ $market->odds }}"></td>
+                            <td>{{ $market->market_name }}</td>
+                            <td>{{ $market->category }}</td>
+                            <td class="odds">{{ $market->odds }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
             <div class="mt-4 col-sm-6 col-md-4 col-lg-3">
                 <label for="total_stake">Total Stake:</label>
                 <input type="number" id="total_stake" class="form-control" min="1" placeholder="Enter Stake amount">
@@ -60,7 +85,6 @@
             <button class="btn btn-success" id="place_multibet">Place Multibet</button>
         </div>
     </div>
-
     <!-- Placed Multibets Section -->
     <div class="mt-4 card">
         <div class="card-body">
@@ -99,7 +123,10 @@
             </div>
         </div>
     </div>
+
 </div>
+
+@endsection
 
 <!-- Include SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -109,16 +136,26 @@
 <script>
 $(document).ready(function () {
     let selectedBets = [];
+    let selectedMarkets = [];
 
     function updateTotalOdds() {
-        let totalOdds = selectedBets.reduce((acc, bet) => acc * parseFloat(bet.odds), 1).toFixed(2);
+        // Calculate total odds from selected bets
+        let totalOddsBets = selectedBets.reduce((acc, bet) => acc * parseFloat(bet.odds), 1);
+
+        // Calculate total odds from selected markets
+        let totalOddsMarkets = selectedMarkets.reduce((acc, market) => acc * parseFloat(market.odds), 1);
+
+        // Combine total odds
+        let totalOdds = (totalOddsBets * totalOddsMarkets).toFixed(2);
         $("#total_odds").text(totalOdds);
 
+        // Calculate potential payout
         let stake = parseFloat($("#total_stake").val());
         let potentialPayout = stake ? (stake * totalOdds).toFixed(2) : "0.00";
         $("#potential_payout").text(potentialPayout);
     }
 
+    // Handle bet selection
     $(".bet-checkbox").change(function () {
         let betId = $(this).val();
         let odds = $(this).data("odds");
@@ -132,13 +169,29 @@ $(document).ready(function () {
         updateTotalOdds();
     });
 
+    // Handle market selection
+    $(".market-checkbox").change(function () {
+        let marketId = $(this).val();
+        let odds = $(this).data("odds");
+
+        if ($(this).is(":checked")) {
+            selectedMarkets.push({ id: marketId, odds: odds });
+        } else {
+            selectedMarkets = selectedMarkets.filter(market => market.id != marketId);
+        }
+
+        updateTotalOdds();
+    });
+
+    // Handle stake input
     $("#total_stake").on("input", function () {
         updateTotalOdds();
     });
 
+    // Place multibet
     $("#place_multibet").click(function () {
-        if (selectedBets.length < 2) {
-            Swal.fire('Error', 'Please select at least two bets for a multibet.', 'error');
+        if (selectedBets.length + selectedMarkets.length < 2) {
+            Swal.fire('Error', 'Please select at least two bets or markets for a multibet.', 'error');
             return;
         }
 
@@ -157,6 +210,7 @@ $(document).ready(function () {
             data: {
                 _token: "{{ csrf_token() }}",
                 bet_ids: selectedBets.map(bet => bet.id),
+                market_ids: selectedMarkets.map(market => market.id),
                 total_stake: stake,
                 total_odds: totalOdds,
                 potential_payout: potentialPayout
@@ -203,6 +257,7 @@ $(document).ready(function () {
         });
     });
 });
+
 </script>
 
-@endsection
+

@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\BettingMarket;
 use Illuminate\Http\Request;
 use App\Models\Matches;
 use Carbon\Carbon;
-
+use App\Models\Sport;
 class MatchController extends Controller
 {
     public function fetchMatches(Request $request)
@@ -47,5 +47,27 @@ class MatchController extends Controller
                 'updated_at' => $match->updated_at,
             ];
         });
+    }
+
+    public function matchesWithOdds(Request $request)
+    {
+        $perPage = 50;
+        $page = $request->query('page', 1);
+
+        // Fetch paginated matches
+        $matches = Matches::orderBy('date', 'asc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+            // Fetch all sports
+        $sports = Sport::all();
+
+        // Fetch all betting markets once (since they apply to every match)
+        $bettingMarkets = BettingMarket::all();
+
+        return view('markets.index', [
+            'matches' => $matches,
+            'bettingMarkets' => $bettingMarkets,
+            'sports' => $sports,
+        ]);
     }
 }

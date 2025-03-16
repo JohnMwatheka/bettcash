@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bet;
 use App\Models\Multibet;
-use Illuminate\Support\Facades\DB;
+use App\Models\BettingMarket; // Add this line
 
 class BetController extends Controller
 {
@@ -61,20 +61,28 @@ class BetController extends Controller
 
     public function multibets()
     {
+        // Fetch bets and betting markets
         $bets = Bet::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
+        $bettingMarkets = BettingMarket::all(); // Fetch all betting markets
         $placedMultibets = Multibet::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
 
-        return view('bets.multibets', compact('bets', 'placedMultibets'));
+        return view('bets.multibets', compact('bets', 'bettingMarkets', 'placedMultibets'));
     }
-
     public function storeMultibet(Request $request)
     {
         $request->validate([
-            'bet_ids' => 'required|array|min:2',
+            'bet_ids' => 'nullable|array', // Allow bet_ids to be nullable
+            'market_ids' => 'nullable|array', // Add validation for market_ids
             'total_stake' => 'required|numeric|min:1',
             'total_odds' => 'required|numeric|min:1',
             'potential_payout' => 'required|numeric|min:1',
         ]);
+
+        // Ensure at least two selections (bets or markets)
+        $totalSelections = count($request->bet_ids ?? []) + count($request->market_ids ?? []);
+        if ($totalSelections < 2) {
+            return response()->json(['message' => 'Please select at least two bets or markets for a multibet.'], 422);
+        }
 
         $user = Auth::user();
         $multibet = Multibet::create([
@@ -84,9 +92,20 @@ class BetController extends Controller
             'potential_payout' => $request->potential_payout,
         ]);
 
-        $bets = Bet::whereIn('id', $request->bet_ids)->get();
-        foreach ($bets as $bet) {
-            $multibet->bets()->attach($bet->id);
+        // Attach selected bets (if any)
+        if ($request->bet_ids) {
+            $bets = Bet::whereIn('id', $request->bet_ids)->get();
+            foreach ($bets as $bet) {
+                $multibet->bets()->attach($bet->id);
+            }
+        }
+
+        // Attach selected markets (if any)
+        if ($request->market_ids) {
+            $markets = BettingMarket::whereIn('id', $request->market_ids)->get();
+            foreach ($markets as $market) {
+                $multibet->markets()->attach($market->id);
+            }
         }
 
         return response()->json(['message' => 'Multibet placed successfully']);
@@ -96,6 +115,7 @@ class BetController extends Controller
     {
         $multibet = Multibet::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $multibet->bets()->detach(); // Detach all related bets
+        $multibet->markets()->detach(); // Detach all related markets
         $multibet->delete();
 
         return response()->json(['message' => 'Multibet deleted successfully']);
